@@ -26,6 +26,7 @@ export EDITOR=vim
 alias grep='grep --color'                     # show differences in colour
 alias egrep='egrep --color=auto'              # show differences in colour
 alias fgrep='fgrep --color=auto'              # show differences in colour
+alias igrep='egrep -i'				#case insensitive
 
 alias ls='ls -1 -s -h --color=tty --group-directories-first'
 alias dir='ls --color=auto --format=vertical'
@@ -56,3 +57,9 @@ alias cp='cp -i'
 
 #set prompt
 export PS1=$'%F{cyan}%!%F{green}%~ $ %F{white}'
+#adjust for SSH
+if test $SSH_CLIENT
+then
+	export PS1='%F{red}%!%F{magenta}%~ $ %F{white}'
+	export RPS1='%F{green}%n%F{yellow}@%F{red}%M%F{white}'
+fi
