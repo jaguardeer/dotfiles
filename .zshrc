@@ -63,3 +63,8 @@ then
 	export PS1='%F{red}%!%F{magenta}%~ $ %F{white}'
 	export RPS1='%F{green}%n%F{yellow}@%F{red}%M%F{white}'
 fi
+#adjust for TMUX
+if test $TMUX
+then
+	export RPS1=''
+fi
