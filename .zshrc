@@ -18,7 +18,7 @@ compinit
 #
 setopt histignorespace
 setopt correct
-setopt cshjunkiequotes
+#setopt cshjunkiequotes
 setopt globdots
 setopt noclobber
 
