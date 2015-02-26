@@ -1,7 +1,7 @@
 # this script is executed by interactive shells
 
 # Lines configured by zsh-newuser-install
-HISTFILE=~/.histfile
+HISTFILE=~/.zsh/.histfile
 HISTSIZE=800
 SAVEHIST=800
 setopt autocd
@@ -17,6 +17,10 @@ compinit
 # End of lines added by compinstall
 #
 setopt histignorespace
+setopt correct
+setopt cshjunkiequotes
+setopt globdots
+setopt noclobber
 
 
 # my stuff:
@@ -28,7 +32,7 @@ alias egrep='egrep --color=auto'              # show differences in colour
 alias fgrep='fgrep --color=auto'              # show differences in colour
 alias igrep='egrep -i'				#case insensitive
 
-alias ls='ls -1 -s -h --color=tty --group-directories-first'
+alias ls='ls --color=tty --group-directories-first'
 alias dir='ls --color=auto --format=vertical'
 
 zstyle ':completion:*' list-colors "${(@s.:.)LS_COLORS}"
@@ -76,7 +80,7 @@ precmd() {
 }
 zle-keymap-select() {
   RPROMPT=""
-  [[ $KEYMAP = vicmd ]] && RPROMPT="%F{blue}*%F{white}"
+  [[ $KEYMAP = vicmd ]] && RPROMPT="%F{cyan}*%F{white}"
   () { return $__prompt_status }
   zle reset-prompt
 }
