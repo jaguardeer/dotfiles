@@ -1,13 +1,13 @@
-" An example for a vimrc file.
 "
-" Maintainer:	Bram Moolenaar <Bram@vim.org>
-" Last change:	2014 Feb 05
 "
-" To use it, copy it to
-"     for Unix and OS/2:  ~/.vimrc
-"	      for Amiga:  s:.vimrc
-"  for MS-DOS and Win32:  $VIM\_vimrc
-"	    for OpenVMS:  sys$login:.vimrc
+"
+" jaguardeer's vimrc
+"
+"	-pathogen
+"	-solarized
+"	-ergonomic bindings
+"
+"
 
 " When started as "evim", evim.vim will already have done these settings.
 if v:progname =~? "evim"
@@ -35,9 +35,6 @@ set incsearch		" do incremental searching
 " For Win32 GUI: remove 't' flag from 'guioptions': no tearoff menu entries
 " let &guioptions = substitute(&guioptions, "t", "", "g")
 
-" Don't use Ex mode, use Q for formatting
-map Q gq
-
 " CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
 " so that you can undo CTRL-U after inserting a line break.
 inoremap <C-U> <C-G>u<C-U>
@@ -46,6 +43,9 @@ inoremap <C-U> <C-G>u<C-U>
 if has('mouse')
   set mouse=a
 endif
+
+"Set 256 colors
+set t_Co=256
 
 " Switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.
@@ -96,54 +96,69 @@ if !exists(":DiffOrig")
 		  \ | wincmd p | diffthis
 endif
 
-
+execute pathogen#infect()
 
 " Set user directory to ~/.vim
 set backupdir=$HOME/.vim/vimbak
 set undodir=$HOME/.vim/vimbak
 set viminfo+=n$HOME/.vim/viminfo
 
-" tags search
+" tags search dir
 set tags=./tags;
 
 " Set line numbers and highlight
 set nu
 set cursorline
 
-hi clear CursorLine
-augroup CLClear
-    autocmd! ColorScheme * hi clear CursorLine
-augroup END
-
+" set colorscheme to solarized
+set background=dark
+let g:solarized_termcolors=256
+colorscheme solarized
+" adjust colors a little bit
 hi CursorLineNR ctermfg=Red
-augroup CLNRSet
-    autocmd! ColorScheme * hi CursorLineNR ctermfg=Red
-augroup END
+hi VertSplit ctermfg=black
+hi MatchParen ctermbg=black ctermfg=grey
+" highlight when lines get long
+highlight ColorColumn ctermbg=black ctermfg=red
+call matchadd('ColorColumn', '\%85v', 100)
 
-" set colorscheme - advantage looks great on makefiles
-"set background=dark
-colorscheme advantage
-set t_Co=8
-"colorscheme baycomb
-"colorscheme solarized
 
-hi StatusLine ctermfg=DarkBlue ctermbg=white
-hi StatusLineNC ctermfg=LightBlue ctermbg=black
-hi VertSplit ctermfg=black ctermbg=red
-
-" remap some keys
+" make some key mappings
 let mapleader = " "
-nnoremap <leader>n :nohl<CR>
-nnoremap <leader>h :set hls<CR>
+map <leader> <plug>(easymotion-prefix)
+nnoremap <leader><leader>r :source ~/.vim/vimrc<CR>
+nnoremap <leader><leader>n :set nohlsearch<CR>
+nnoremap <leader><leader>h :set hls<CR>
+nnoremap <leader><leader>j :set incsearch<CR>
+nnoremap <leader><leader>m :set noincsearch<CR>
+" ; is easier than :, switch , and ;
 noremap ; :
 noremap : ,
 noremap , ;
+nnoremap q; q:
+" definition is last mark usually
 nnoremap <C-]> 9<C-]>
+" less shift toggling
 noremap ' "
 noremap " '
+" noshift for +
 noremap = +
 noremap + =
+" Q = qq (and can end macros too)
+nnoremap Q qq<esc>
+" ergonomix
 map <C-c> <esc>
+" yY doesnt yank newline
+nnoremap yY ^y$
+" make Y behave like D
+nnoremap Y y$
+" make K behave like J
+nnoremap K kJ
+" Make (){} more useful in coding
+nnoremap ( ?\V(\\|)<CR>:noh<CR>
+nnoremap ) /\V(\\|)<CR>:noh<CR>
+nnoremap { ?\V{\\|}<CR>:noh<CR>
+nnoremap } /\V{\\|}<CR>:noh<CR>
 " reduce shift toggling for copypasta
 nnoremap "* "8
 nnoremap '* "8
@@ -160,10 +175,6 @@ set timeoutlen=1000 ttimeoutlen=0
 " set indent depth
 set tabstop=6
 set shiftwidth=6
-
-" highlight when lines get long
-highlight ColorColumn ctermbg=red
-call matchadd('ColorColumn', '\%85v', 100)
 
 " GLSL syntax highlighting
 autocmd BufNewFile,BufRead *.glsl,*.geom,*.vert,*.frag,*.gsh,*.vsh,*.fsh,*.vs,*.fs set filetype=glsl
