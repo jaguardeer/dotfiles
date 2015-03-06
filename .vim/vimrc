@@ -5,88 +5,68 @@
 "
 "	-pathogen
 "	-solarized
+"	-gundo
 "	-ergonomic bindings
 "
-"
 
-" When started as "evim", evim.vim will already have done these settings.
-if v:progname =~? "evim"
-  finish
-endif
-
-" Use Vim settings, rather than Vi settings (much better!).
-" This must be first, because it changes other options as a side effect.
 set nocompatible
 
-" allow backspacing over everything in insert mode
-set backspace=indent,eol,start
-
-if has("vms")
-  set nobackup		" do not keep a backup file, use versions instead
-else
-  set backup		" keep a backup file (restore to previous version)
-  set undofile		" keep an undo file (undo changes after closing)
-endif
-set history=50		" keep 50 lines of command line history
-set ruler		" show the cursor position all the time
-set showcmd		" display incomplete commands
+" OPTIONS
+set tabstop=4		" set indent depth
+set shiftwidth=4
+set confirm
+set backup			" keep a backup file (restore to previous version)
+set undofile		" keep an undo file (undo changes after closing)
+set history=100		" keep command line history
+set ruler			" show the cursor position all the time
+set showcmd			" display incomplete commands
 set incsearch		" do incremental searching
+set ignorecase		" smartcase default search
+set smartcase
+set backspace=indent,eol,start " delete everything
+set nu			" Set line numbers and highlight
+set cursorline
 
-" For Win32 GUI: remove 't' flag from 'guioptions': no tearoff menu entries
-" let &guioptions = substitute(&guioptions, "t", "", "g")
+set timeoutlen=1000 ttimeoutlen=0 " make <ESC> respond better
 
-" CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
-" so that you can undo CTRL-U after inserting a line break.
-inoremap <C-U> <C-G>u<C-U>
+set showbreak=└
+" set list
+set listchars=extends:»,precedes:« ",eol:┐,tab:>–,trail:░
+" hi SpecialKey cterm=NONE ctermfg=235 ctermbg=NONE
+" hi NonText cterm=NONE ctermfg=235 ctermbg=NONE
 
-" In many terminal emulators the mouse works just fine, thus enable it.
+" Set user directory to ~/.vim
+set backupdir=$HOME/.vim/vimbak
+set undodir=$HOME/.vim/vimbak
+set viminfo+=n$HOME/.vim/viminfo
+
+set tags=./tags; 		" set default tags search dir
+
+" allow mouse
 if has('mouse')
   set mouse=a
 endif
 
-"Set 256 colors
-set t_Co=256
-
-" Switch syntax highlighting on, when the terminal has colors
-" Also switch on highlighting the last used search pattern.
+" syntax and colors
 if &t_Co > 2 || has("gui_running")
   syntax on
   set hlsearch
 endif
 
-" Only do this part when compiled with support for autocommands.
-if has("autocmd")
+filetype plugin indent on
 
-  " Enable file type detection.
-  " Use the default filetype settings, so that mail gets 'tw' set to 72,
-  " 'cindent' is on in C files, etc.
-  " Also load indent files, to automatically do language-dependent indenting.
-  filetype plugin indent on
+" For all text files set 'textwidth' to 78 characters.
+autocmd FileType text setlocal textwidth=78
 
-  " Put these in an autocmd group, so that we can delete them easily.
-  augroup vimrcEx
-  au!
-
-  " For all text files set 'textwidth' to 78 characters.
-  autocmd FileType text setlocal textwidth=78
-
-  " When editing a file, always jump to the last known cursor position.
-  " Don't do it when the position is invalid or when inside an event handler
-  " (happens when dropping a file on gvim).
-  " Also don't do it when the mark is in the first line, that is the default
-  " position when opening a file.
-  autocmd BufReadPost *
-    \ if line("'\"") > 1 && line("'\"") <= line("$") |
-    \   exe "normal! g`\"" |
-    \ endif
-
-  augroup END
-
-else
-
-  set autoindent		" always set autoindenting on
-
-endif " has("autocmd")
+" When editing a file, always jump to the last known cursor position.
+" Don't do it when the position is invalid or when inside an event handler
+" (happens when dropping a file on gvim).
+" Also don't do it when the mark is in the first line, that is the default
+" position when opening a file.
+autocmd BufReadPost *
+\ if line("'\"") > 1 && line("'\"") <= line("$") |
+\   exe "normal! g`\"" |
+\ endif
 
 " Convenient command to see the difference between the current buffer and the
 " file it was loaded from, thus the changes you made.
@@ -96,85 +76,112 @@ if !exists(":DiffOrig")
 		  \ | wincmd p | diffthis
 endif
 
-execute pathogen#infect()
 
-" Set user directory to ~/.vim
-set backupdir=$HOME/.vim/vimbak
-set undodir=$HOME/.vim/vimbak
-set viminfo+=n$HOME/.vim/viminfo
 
-" tags search dir
-set tags=./tags;
+" KEY MAPPINGS
 
-" Set line numbers and highlight
-set nu
-set cursorline
-
-" set colorscheme to solarized
-set background=dark
-let g:solarized_termcolors=256
-colorscheme solarized
-" adjust colors a little bit
-hi CursorLineNR ctermfg=Red
-hi VertSplit ctermfg=black
-hi MatchParen ctermbg=black ctermfg=grey
-" highlight when lines get long
-highlight ColorColumn ctermbg=black ctermfg=red
-call matchadd('ColorColumn', '\%85v', 100)
-
+" safer C-U
+inoremap <C-U> <C-G>u<C-U>
 
 " make some key mappings
 let mapleader = " "
-map <leader> <plug>(easymotion-prefix)
 nnoremap <leader><leader>r :source ~/.vim/vimrc<CR>
 nnoremap <leader><leader>n :set nohlsearch<CR>
 nnoremap <leader><leader>h :set hls<CR>
 nnoremap <leader><leader>j :set incsearch<CR>
 nnoremap <leader><leader>m :set noincsearch<CR>
+" screen navigation
+nnoremap <C-y> <C-d>
+nnoremap <C-d> <C-b>
+nnoremap <C-k> <C-y>
+nnoremap <C-j> <C-e>
+nnoremap <C-e> <C-k>
 " ; is easier than :, switch , and ;
 noremap ; :
 noremap : ,
 noremap , ;
-nnoremap q; q:
+noremap q; q:
+noremap q: q;
+" C-w goes to previous window
+nnoremap <C-w><C-w> <C-w><C-p>
+nnoremap <C-w><C-p> <C-w><C-w>
 " definition is last mark usually
 nnoremap <C-]> 9<C-]>
-" less shift toggling
+" make <CR> jump to line N
+nnoremap <CR> G
+" swap mark and register
 noremap ' "
 noremap " '
+noremap "" ''
+" reduce shift toggling for copypasta
+noremap '8 "*
+noremap '* "8
 " noshift for +
 noremap = +
 noremap + =
 " Q = qq (and can end macros too)
 nnoremap Q qq<esc>
-" ergonomix
-map <C-c> <esc>
 " yY doesnt yank newline
 nnoremap yY ^y$
 " make Y behave like D
 nnoremap Y y$
 " make K behave like J
 nnoremap K kJ
-" Make (){} more useful in coding
-nnoremap ( ?\V(\\|)<CR>:noh<CR>
-nnoremap ) /\V(\\|)<CR>:noh<CR>
-nnoremap { ?\V{\\|}<CR>:noh<CR>
-nnoremap } /\V{\\|}<CR>:noh<CR>
-" reduce shift toggling for copypasta
-nnoremap "* "8
-nnoremap '* "8
-nnoremap "8 "*
-nnoremap '8 "*
-" split keyboard macro keys
-"noremap <a-Home> <esc>
-"noremap <a-left> <c-t>
-"noremap <a-right> 9<c-]>
+" start normal ex easier
+vnoremap ( :norm
+" build stuff with make
+nnoremap <F4> :make<CR>
+" navigate by visual lines with j/k
+nnoremap j gj
+nnoremap k gk
+nnoremap gj j
+nnoremap gk k
 
-" make <ESC> respond better
-set timeoutlen=1000 ttimeoutlen=0
 
-" set indent depth
-set tabstop=6
-set shiftwidth=6
+
+
+
+" PLUGINS
+execute pathogen#infect()
+
+
+" use gundo
+nnoremap <F5> :GundoToggle<CR>
+
+" make YCM and UltiSnips play nice
+" let g:ycm_server_log_level = 'debug'
+let g:ycm_global_ycm_extra_conf = '/home/paco/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
+let g:ycm_key_list_select_completion=['<tab>']
+let g:ycm_key_list_previous_completion=['<s-tab>']
+let g:UltiSnipsExpandTrigger="<c-j>"
+let g:UltiSnipsJumpForwardTrigger="<c-j>"
+let g:UltiSnipsJumpBackwardTrigger="<c-p>"
+let g:UltiSnipsEditSplit="vertical"
+
+map <leader> <plug>(easymotion-prefix)
+nmap <leader>. <plug>(easymotion-repeat)
+nmap S <plug>(easymotion-s)
+map <leader>s <plug>(easymotion-s2)
+map <leader>,w <Plug>CamelCaseMotion_w
+map <leader>,b <Plug>CamelCaseMotion_b
+map <leader>,e <Plug>CamelCaseMotion_e
+
+" use fzf for search
+set rtp+=~/.fzf
 
 " GLSL syntax highlighting
 autocmd BufNewFile,BufRead *.glsl,*.geom,*.vert,*.frag,*.gsh,*.vsh,*.fsh,*.vs,*.fs set filetype=glsl
+"
+" set colorscheme to solarized
+set background=dark
+if &t_Co == 256
+	let g:solarized_termcolors=256
+endif
+colorscheme solarized
+" adjust colors a little bit
+hi CursorLineNR ctermfg=Red
+hi VertSplit ctermfg=black
+hi MatchParen ctermbg=black ctermfg=grey
+" highlight long lines
+highlight ColorColumn ctermbg=black ctermfg=red
+call matchadd('ColorColumn', '\%85v', 100)
